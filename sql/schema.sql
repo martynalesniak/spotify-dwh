@@ -16,7 +16,6 @@ CREATE TABLE dim_Date (
 
 CREATE TABLE dim_Track (
     track_id BIGINT PRIMARY KEY,
-    date_key BIGINT,
     track_name VARCHAR(255),
     main_artist_name VARCHAR(100),
     artist_count TINYINT,
@@ -33,7 +32,6 @@ CREATE TABLE dim_Track (
     liveness FLOAT,
     valence FLOAT,
     tempo FLOAT,
-    FOREIGN KEY (date_key) REFERENCES dim_Date(date_id)
 );
 
 
