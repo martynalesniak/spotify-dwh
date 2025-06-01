@@ -3,4 +3,7 @@ sqlalchemy
 psycopg2-binary
 spotipy
 python-dotenv
+numpy
+holidays
+pycountry
 musicbrainzngs
