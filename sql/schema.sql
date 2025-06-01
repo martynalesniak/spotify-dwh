@@ -15,12 +15,13 @@ CREATE TABLE dim_Date (
 
 
 CREATE TABLE dim_Track (
-    track_id BIGINT PRIMARY KEY,
+    track_key BIGINT PRIMARY KEY,
     track_name VARCHAR(255),
-    main_artist_name VARCHAR(100),
+    artists_name VARCHAR(100),
     artist_count TINYINT,
     duration INT,
     explicit BOOLEAN,
+    spotify_track_id VARCHAR(22),
     genre VARCHAR(100),
     danceability FLOAT,
     energy FLOAT,
@@ -37,6 +38,7 @@ CREATE TABLE dim_Track (
 
 CREATE TABLE dim_Artist (
     artist_id BIGINT PRIMARY KEY,
+    artist_spotify_id VARCHAR(22), 
     artist_name VARCHAR(255),
     artist_spotify_id VARCHAR(100),
     artist_genre VARCHAR(100),
