@@ -3,6 +3,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import pandas as pd
 from dotenv import load_dotenv 
 import musicbrainzngs
+import json
 
 def get_track_id(sp, track_name, artist_name):
     """Takes track_name and artist and returns track_id"""
@@ -18,46 +19,54 @@ def get_track_id(sp, track_name, artist_name):
     return track_id
 
 
-def get_duration(sp, track_ids):
-    """Takes a list of track_ids and returns a dataframe with duration for each id"""
-    results = []
+def get_track_metadata(sp, track_id):
+    """Search for track and artist metadata in spotify api """
     try:
-        response = sp.tracks(track_ids)
-        for track in response.get('tracks', []):
-            results.append({
-                'track_id': track['id'],
-                'duration_ms': track.get('duration_ms')
-            })
-    except Exception as e:
-        for track_id in track_ids:
-            results.append({
-                'track_id': track_id,
-                'duration_ms': None
-            })
+        # track metadata
+        track_info = sp.track(track_id)
+        duration = track_info.get('duration_ms') / 1000
+        explicit = track_info.get('explicit')
+        track_name = track_info.get('name')
+        artists = track_info['artists']
+        artist_count = len(artists)
 
-    return pd.DataFrame(results)
-def get_genre(sp, track_ids):
-    """Takes a list of track_ids and returns a dataframe with list of genres for each id """
-    results = []
-    for track_id in track_ids:
-        try:
-            track_info = sp.track(track_id)
-            artist_id = track_info['artists'][0]['id']
-            artist_info = sp.artist(artist_id)
-            genres = artist_info.get('genres', [])
-        except Exception:
-            genres = []
+        artist = artists[0]
+        artist_id = artist['id']
+        artist_name = artist['name']
 
-        results.append({
+
+        featuring_artists_raw = artists[1:]
+        featuring_artists = [
+            {
+                'artist_id': fa['id'],
+                'artist_name': fa['name']
+            }
+            for fa in featuring_artists_raw
+        ]
+
+        # dane o artyście (gatunki)
+        artist_info = sp.artist(artist_id)
+        genres = artist_info.get('genres', [])
+
+        return {
             'track_id': track_id,
-            'genres': genres
-        })
+            'track_name': track_name,
+            'duration': duration,
+            'explicit': explicit,
+            'artist_id': artist_id,
+            'artist_name': artist_name,
+            'genres': json.dumps(genres),  # ← teraz jako JSON
+            'featuring_artists': json.dumps(featuring_artists),  # ← też JSON
+            'artist_count': artist_count
+        }
 
-    return pd.DataFrame(results)
+    except Exception as e:
+        print(f"Błąd przy przetwarzaniu track_id {track_id}: {e}")
+        return None
 
 
 musicbrainzngs.set_useragent("MyCoolApp", "0.1", "mojemail@example.com")
-def get_artist_area(artist_name):
+def get_artist_metadata(artist_name):
     """
     Search for artist by name and returns his country.
     """
@@ -77,12 +86,13 @@ def get_artist_area(artist_name):
         mbid = matching_artist['id']
         artist_data = musicbrainzngs.get_artist_by_id(mbid)
         artist = artist_data.get("artist", {})
-        # print(f"Nazwa:        {artist.get('name', 'brak')}")
-        # print(f"Kraj (area):  {artist.get('area', {}).get('name', 'brak')}")
-        # print(f"MBID:         {artist.get('id', 'brak')}")
-        
-        area = artist.get('area', {})
-        return area.get('name', None)
+        country = artist.get('area', {}).get('name')
+        artist_type = artist.get('type', None)
+
+        return {
+            'country': country,
+            'type': artist_type
+        }
 
     except Exception as e:
         return None
