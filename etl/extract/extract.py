@@ -8,16 +8,20 @@ import musicbrainzngs
 import time
 from datetime import datetime
 
-env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
+# env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
+env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
 load_dotenv(dotenv_path=env_path)
 
 class SpotifyExtractor:
     def __init__(self, client_id=None, client_secret=None):
-        self.client_id = client_id or os.getenv('SPOTIFY_CLIENT_ID')
+        self.client_id = client_id or os.getenv('SPOTIFY_API_KEY')
         self.client_secret = client_secret or os.getenv('CLIENT_SECRET')
         self.sp = self._setup_spotify_client()
+        print(f"Spotify client initialized with ID: {self.client_id}")
+        print(f"Spotify client initialized with secret: {self.client_secret}")
 
     def _setup_spotify_client(self):
+        load_dotenv(dotenv_path=env_path)
         try:
             return spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=self.client_id,
                                                            client_secret=self.client_secret))
@@ -121,7 +125,7 @@ class CSVExtractor:
         "title":"track_name",
         "artist":"artist_name",
         "chart": "chart_type",
-        "trend": "position_change",
+        # "trend": "position_change",
         "Date":"date",
         "Song":"track_name",
         "Artist":"artist_name",
@@ -145,16 +149,16 @@ class CSVExtractor:
             raise
 
     def standardize_columns(self, df):
-        """Standardize column names"""
         df = df.rename(columns={
-            k: v for k, v in self.COLUMN_MAPPINGS.items() 
+            k: v for k, v in self.COL_MAPPINGS.items() 
             if k in df.columns
         })
         return df
+
     def extract_data(self, file_path, limit=30):
         """Extract and standardize data from CSV"""
         try:
-            df = pd.read_csv(file_path, limit=limit)
+            df = pd.read_csv(file_path).head(limit)
             df = self.standardize_columns(df)
 
             filename = os.path.basename(file_path)
@@ -228,13 +232,11 @@ class EnrichedCSVExtractor(CSVExtractor):
 
         df = super().extract_data(file_path, limit=limit)
         
-        if enrich and self.enrich_with_apis:
-            
-            if hasattr(self, 'spotify_api'):
-                df = self.enrich_with_spotify_data(df)
-            
-            if hasattr(self, 'musicbrainz_api'):
-                df = self.enrich_with_musicbrainz_data(df)
+        if enrich:
+
+            df = self.enrich_with_spotify_data(df)
+            df = self.enrich_with_musicbrainz_data(df)
+
             
         
         return df

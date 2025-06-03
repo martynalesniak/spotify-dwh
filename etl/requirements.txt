@@ -8,3 +8,4 @@ holidays
 pycountry
 musicbrainzngs
 world_bank_data
+matplotlib
