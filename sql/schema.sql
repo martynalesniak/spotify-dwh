@@ -22,8 +22,7 @@ CREATE TABLE dim_Track (
     artist_count TINYINT,
     duration FLOAT,
     explicit BOOLEAN,
-    spotify_track_id VARCHAR(22),
-    genre JSONB
+    spotify_track_id VARCHAR(22)
 );
 
 
@@ -31,7 +30,7 @@ CREATE TABLE dim_Artist (
     artist_id BIGINT PRIMARY KEY,
     artist_spotify_id VARCHAR(22), 
     artist_name VARCHAR(255),
-    artist_genre VARCHAR(100),
+    artist_genre JSONB,
     artist_country VARCHAR(100),
     artist_type VARCHAR(50)
 );

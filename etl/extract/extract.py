@@ -151,10 +151,10 @@ class CSVExtractor:
             if k in df.columns
         })
         return df
-    def extract_data(self, file_path):
+    def extract_data(self, file_path, limit=30):
         """Extract and standardize data from CSV"""
         try:
-            df = pd.read_csv(file_path)
+            df = pd.read_csv(file_path, limit=limit)
             df = self.standardize_columns(df)
 
             filename = os.path.basename(file_path)
@@ -223,10 +223,10 @@ class EnrichedCSVExtractor(CSVExtractor):
                     df.loc[mask, f'mb_{key}'] = value
         
         return df
-    def extract_data(self, file_path, enrich=True):
+    def extract_data(self, file_path, limit=30, enrich=True):
         """Extract data with optional API enrichment"""
 
-        df = super().extract_data(file_path)
+        df = super().extract_data(file_path, limit=limit)
         
         if enrich and self.enrich_with_apis:
             
