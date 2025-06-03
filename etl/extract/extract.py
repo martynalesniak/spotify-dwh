@@ -17,9 +17,7 @@ class SpotifyExtractor:
         self.client_id = client_id or os.getenv('SPOTIFY_API_KEY')
         self.client_secret = client_secret or os.getenv('CLIENT_SECRET')
         self.sp = self._setup_spotify_client()
-        print(f"Spotify client initialized with ID: {self.client_id}")
-        print(f"Spotify client initialized with secret: {self.client_secret}")
-
+  
     def _setup_spotify_client(self):
         load_dotenv(dotenv_path=env_path)
         try:
