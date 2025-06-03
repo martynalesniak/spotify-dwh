@@ -71,18 +71,27 @@ def get_artist_metadata(artist_name):
     Search for artist by name and returns his country.
     """
     try:
-        result = musicbrainzngs.search_artists(artist=artist_name, limit=15)
+        result = musicbrainzngs.search_artists(artist=artist_name, limit=30)
         artists = result.get('artist-list', [])
         if not artists:
             print("Artysta nie znaleziony")
             return None
         
+        print(f"Znaleziono {len(artists)} artystów dla nazwy '{artist_name}':\n")
+
+        for i, a in enumerate(artists, 1):
+            name = a.get('name', 'brak nazwy')
+            artist_type = a.get('type', 'brak typu')
+            country = a.get('area', {}).get('name', 'brak kraju')
+            disambiguation = a.get('disambiguation', '')
+            print(f"{i}. {name} ({artist_type}, {country}) {'- ' + disambiguation if disambiguation else ''}")
         matching_artist = next((a for a in artists if a.get('name', '').lower() == artist_name.lower()), None)
 
         if not matching_artist:
-            print(f"Brak dokładnego dopasowania dla: {artist_name}")
+            matching_artist = next((a for a in artists if a.get('sort-name', '').lower() == artist_name.lower()), None)
+        if not matching_artist:
+            print("Brak dopasowania dla artysty w musibrainz")
             return None
-        
         mbid = matching_artist['id']
         artist_data = musicbrainzngs.get_artist_by_id(mbid)
         artist = artist_data.get("artist", {})
