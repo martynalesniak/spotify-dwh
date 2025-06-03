@@ -8,7 +8,8 @@ import musicbrainzngs
 import time
 from datetime import datetime
 
-load_dotenv()
+env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
+load_dotenv(dotenv_path=env_path)
 
 class SpotifyExtractor:
     def __init__(self, client_id=None, client_secret=None):
