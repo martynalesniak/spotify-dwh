@@ -10,8 +10,7 @@ from datetime import datetime
 import unicodedata
 import re
 import traceback
-from offset_utils import get_offset, update_offset
-
+from etl.utils.offset_variable import get_offset, update_offset
 # env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
 #env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
 #load_dotenv(dotenv_path=env_path)
@@ -21,6 +20,7 @@ load_dotenv()
 class Cache:
     def __init__(self, cache_path="/app/cache/id_cache.json"):
         self.cache_path = cache_path
+        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
         if os.path.exists(cache_path):
             with open(cache_path, "r") as f:
                 self.data = json.load(f)
@@ -99,7 +99,7 @@ class SpotifyExtractor:
             genres = artist_info.get('genres', [])
 
             return {
-                'track_id': track_id,
+                'spotify_track_id': track_id,
                 'track_name': track_name,
                 'duration': duration,
                 'explicit': explicit,
@@ -171,7 +171,6 @@ class CSVExtractor:
         "Weeks in Charts": "weeks_on_chart"
 
     }
-    
     def __init__(self, source):
         self.source = source
 
@@ -195,19 +194,19 @@ class CSVExtractor:
 
     def extract_data(self, file_path, offset=0, limit=100):
         try:
-            print(f"Reading {limit} rows from offset {offset} in {file_path}")
-            df = pd.read_csv(file_path, skiprows=range(1, offset + 1), nrows=limit)
+            source_type = os.path.basename(file_path).split('.')[0]
+            current_offset = offset if offset > 0 else get_offset(source_type)
+            
+            print(f"Reading {limit} rows from offset {current_offset} in {file_path}")
+            df = pd.read_csv(file_path, skiprows=range(1, current_offset + 1), nrows=limit)
             df = self.standardize_columns(df)
-
-            filename = os.path.basename(file_path)
-            source_type = filename.split('.')[0]
             df['source_type'] = source_type
 
-            update_offset(file_path, offset + len(df))
-
+            update_offset(source_type, current_offset + len(df))
             return df
+            
         except Exception as e:
-            print("The error occured while extracting csv data")
+            print(f"Error extracting data: {str(e)}")
             raise
 
 class EnrichedCSVExtractor(CSVExtractor):
@@ -239,7 +238,6 @@ class EnrichedCSVExtractor(CSVExtractor):
                 enriched_data.append(enriched_row)
             else:
                 track_id = self.spotify_api.get_track_id(track_name, artist_name)
-
                 if track_id:
                     spotify_metadata = self.spotify_api.get_track_metadata(track_id)
                     if spotify_metadata:
@@ -279,7 +277,6 @@ class EnrichedCSVExtractor(CSVExtractor):
             metadata = self.musicbrainz_api.get_artist_metadata(artist_name)
             if metadata:
                 artist_metadata[artist_id] = metadata
-
             
             self.cache.set_artist_status(artist_id, True)
             
@@ -305,54 +302,3 @@ class EnrichedCSVExtractor(CSVExtractor):
             df = self.enrich_with_musicbrainz_data(df)
 
         return df
-    
-# # def extract_multiple_sources(file_paths, output_dir, enrich=True):
-# #     """Extract data from multiple CSV sources"""
-# #     results = {}
-    
-# #     for file_path in file_paths:
-# #         try:
-# #             source_name = os.path.basename(file_path).split('.')[0]
-            
-# #             # Choose extractor based on enrichment requirement
-# #             if enrich:
-# #                 extractor = EnrichedCSVExtractor(source_name)
-# #             else:
-# #                 extractor = CSVExtractor(source_name)
-            
-# #             df = extractor.extract_data(file_path, enrich=enrich)
-            
-# #             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-# #             output_path = os.path.join(output_dir, f"raw_{source_name}_{timestamp}.csv")
-# #             extractor.save_to_csv(df, output_path)
-            
-# #             results[source_name] = output_path
-            
-# #         except Exception as e:
-# #             print(f"Błąd podczas przetwarzania pliku {file_path}: {e}")
-# #             traceback.print_exc()  # <- tu też przyda się pełny traceback
-# #             continue
-    
-# #     return results
-
-# def extract_file(file_path, output_dir, enrich=True, limit=100):
-#     try:
-#         source_name = os.path.basename(file_path).split('.')[0]
-
-#         if enrich:
-#             extractor = EnrichedCSVExtractor(source_name)
-#         else:
-#             extractor = CSVExtractor(source_name)
-
-#         df = extractor.extract_data(file_path, limit=limit, enrich=enrich)
-
-#         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-#         output_path = os.path.join(output_dir, f"raw_{source_name}_{timestamp}.csv")
-#         extractor.save_to_csv(df, output_path)
-
-#         return {source_name: output_path}
-    
-#     except Exception as e:
-#         print(f"Błąd podczas przetwarzania pliku {file_path}: {e}")
-#         traceback.print_exc()
-#         return {}
