@@ -7,6 +7,8 @@ import json
 import musicbrainzngs
 import time
 from datetime import datetime
+import unicodedata
+import re
 
 env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
 #env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
@@ -82,16 +84,9 @@ class SpotifyExtractor:
             artist_name = artist['name']
 
 
-            featuring_artists_raw = artists[1:]
-            featuring_artists = [
-                {
-                    'artist_id': fa['id'],
-                    'artist_name': fa['name']
-                }
-                for fa in featuring_artists_raw
-            ]
+            album_info = track_info.get('album', {})
+            release_date = album_info.get('release_date', None)
 
-            # dane o artyście (gatunki)
             artist_info = self.sp.artist(artist_id)
             genres = artist_info.get('genres', [])
 
@@ -103,8 +98,8 @@ class SpotifyExtractor:
                 'artist_id': artist_id,
                 'artist_name': artist_name,
                 'genres': json.dumps(genres),  # ← teraz jako JSON
-                'featuring_artists': json.dumps(featuring_artists),
-                'artist_count': artist_count
+                'artist_count': artist_count,
+                'release_date': release_date
             }
 
         except Exception as e:
@@ -116,18 +111,24 @@ class MusicBrainzExtractor:
         self.delay = delay
         musicbrainzngs.set_useragent("MyCoolApp", "0.1", "mojemail@example.com")
 
+    def clean_artist_name(self, name):
+        name = name.replace('“', '"').replace('”', '"')
+        name = re.sub(r'[‐‑‒–—―]', '-', name)
+        name = unicodedata.normalize('NFKD', name)
+        return name.strip().lower()
     def get_artist_metadata(self, artist_name):
-        """
-        Search for artist by name and returns his country.
-        """
         try:
+            clean_name = self.clean_artist_name(artist_name)
             result = musicbrainzngs.search_artists(artist=artist_name, limit=15)
             artists = result.get('artist-list', [])
             if not artists:
                 print("Artists not found.")
                 return None
             
-            matching_artist = next((a for a in artists if a.get('name', '').lower() == artist_name.lower()), None)
+            # Użyj clean_name do porównania
+            matching_artist = next(
+                (a for a in artists if self.clean_artist_name(a.get('name', '')) == clean_name), None
+            )
 
             if not matching_artist:
                 print(f"Artist not found for {artist_name}")
@@ -145,7 +146,9 @@ class MusicBrainzExtractor:
             }
 
         except Exception as e:
+            print(f"Błąd MusicBrainz dla {artist_name}: {e}")
             return None
+        
 class CSVExtractor:
     COL_MAPPINGS = {
         "title":"track_name",
