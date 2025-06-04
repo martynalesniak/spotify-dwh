@@ -17,7 +17,9 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - ${AIRFLOW_PROJ_DIR:-.}/files:/tmp/files
+    - airflow_data:/opt/airflow/data
+    - ${AIRFLOW_PROJ_DIR:-.}/sources:/opt/airflow/sources
+
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     redis:
@@ -119,23 +121,42 @@ services:
     image: postgres:14
     container_name: spotify_db
     environment:
-      POSTGRES_DB: spotify_dwh
-      POSTGRES_USER: spotify_user
-      POSTGRES_PASSWORD: spotify_pass
+      POSTGRES_DB: ${SPOTIFY_DB_NAME}          
+      POSTGRES_USER: ${SPOTIFY_DB_USER}        
+      POSTGRES_PASSWORD: ${SPOTIFY_DB_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
       - spotify-db-volume:/var/lib/postgresql/data
+      - ./db_init:/docker-entrypoint-initdb.d
     restart: always
+    healthcheck: 
+      test: ["CMD-SHELL", "pg_isready -U ${SPOTIFY_DB_USER} -d ${SPOTIFY_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   etl-runner:
     image: python:3.11
     container_name: etl_runner
     working_dir: /app
     volumes:
-      - ./etl:/app  # folder z twoimi skryptami
+      - ./etl:/app
+      - ./cache:/app/cache
+      - ./sources:/app/sources
+      - airflow_data:/app/data
+      - - ./.env:/app/.env
     command: tail -f /dev/null
+    environment:
+      - DB_HOST=${SPOTIFY_DB_HOST}
+      - DB_PORT=${SPOTIFY_DB_PORT}
+      - DB_NAME=${SPOTIFY_DB_NAME}
+      - DB_USER=${SPOTIFY_DB_USER}
+      - DB_PASS=${SPOTIFY_DB_PASSWORD}
+      - SPOTIFY_API_KEY=${SPOTIFY_API_KEY}
+      - SPOTIFY_CLIENT_SECRET=${SPOTIFY_CLIENT_SECRET}
     depends_on:
-      - spotify-db
+      spotify-db:
+       condition: service_healthy
     tty: true
 
 
