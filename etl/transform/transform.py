@@ -36,9 +36,14 @@ class ChartPreprocessor:
 
         if 'spotify_track_id' not in df.columns:
             df['spotify_track_id'] = df['track_id']
-        
-        if 'release_date' not in df.columns:
-            df['release_date'] = pd.NaT
+
+        df['weeks_on_chart'] = df['weeks_on_chart'].replace('-', 0)
+
+    
+
+
+
+    
 
         return df
 
@@ -77,8 +82,11 @@ class DateDimension:
         df['holiday_name'] = df[self.date_column].apply(lambda x: country_holidays.get(x, None))
         df['date_id'] = pd.factorize(df['date'])[0] + 1
 
+
         return df[['date_id', 'year', 'month', 'day', 'day_of_week', 'quarter', 'season',
                    'week_of_year', 'is_holiday', 'is_weekend', 'date', 'holiday_name']].drop_duplicates()
+    
+
 
     @staticmethod
     def get_season(month):
@@ -135,6 +143,14 @@ class ArtistDimension:
     def transform(self):
         df = self.df.copy()
 
+        # Sprawdzenie, czy wszystkie potrzebne kolumny istnieją
+        if 'genres' not in df.columns:
+            return pd.DataFrame()
+        
+        df = df[df['genres'].notna()]
+
+
+
         # czyszczenie i normalizacja nazw artystów
         df['artist_name'] = df['artist_name'].astype(str).str.strip()
         df['artist_spotify_id'] = df['artist_id'].astype(str).str.strip()
@@ -145,38 +161,59 @@ class ArtistDimension:
         # Weź tylko pierwszy gatunek lub pusty string, jeśli brak
         df['artist_genre'] = df['genres'].apply(lambda x: x[0] if isinstance(x, list) and len(x) > 0 else "Unknown")
 
-        df['artist_country'] = df['mb_country'].fillna("Unknown")
-        df['artist_type'] = df['mb_type'].fillna('Unknown')
+        df['artist_country'] = df['country'].fillna("Unknown")
+        df['artist_type'] = df['type'].fillna('Unknown')
 
         df['artist_id'] = pd.factorize(df['artist_name'])[0] + 1
 
         artist_dim = df[['artist_id', 'artist_spotify_id', 'artist_name', 
                          'artist_genre', 'artist_country', 'artist_type']].drop_duplicates()
+
         return artist_dim
+
 
 
 class TrackDimension:
     def __init__(self, df: pd.DataFrame):
         self.df = df.copy()
-
+    
     def transform(self):
         df = self.df.copy()
+
+        # czy mamy kolmne release_date?
+        if 'release_date' not in df.columns:
+            return pd.DataFrame()
         
+        df = df[df['release_date'].notna()]
+
+
+        # Normalizacja i konwersje
         df['track_name'] = df['track_name'].astype(str).str.strip()
         df['artist_name'] = df['artist_name'].astype(str).str.strip()
         df['artist_count'] = df['artist_count'].fillna(1).astype(int)
         df['duration'] = df['duration'].fillna(0).astype(float)
         df['explicit'] = df['explicit'].fillna(False).astype(bool)
         df['spotify_track_id'] = df['spotify_track_id'].astype(str).str.strip()
+        # Konwersja release_date z obsługą samych lat
+        df['release_date'] = df['release_date'].astype(str).str.strip()
+        mask_year_only = df['release_date'].str.match(r'^\d{4}$')
+        df.loc[mask_year_only, 'release_date'] = df.loc[mask_year_only, 'release_date'] + '-01-01'
+
         df['release_date'] = pd.to_datetime(df['release_date'], errors='coerce')
-        df['date_key'] = None
+
+        # Usuń wiersze z NaT (czyli niepoprawnymi datami)
+        df = df.dropna(subset=['release_date'])
+
+        
+
 
         df['track_id'] = pd.factorize(df['track_name'])[0] + 1
 
         track_dim = df[['track_id', 'track_name', 'artist_name', 'artist_count',
-                        'duration', 'explicit', 'spotify_track_id', 'release_date', 'date_key']].drop_duplicates()
+                        'duration', 'explicit', 'spotify_track_id', 'release_date']].drop_duplicates()
         
         return track_dim
+
 
 
 
@@ -193,19 +230,23 @@ class FactChart:
         df = self.df.copy()
 
        # merge z wymiarem Track
-        df = df.merge(self.dim_track[['track_id', 'track_name', 'artist_name']],
-                    left_on=['track_name', 'artist_name'],
-                    right_on=['track_name', 'artist_name'],
+        df = df.merge(self.dim_track[['spotify_track_id', 'track_name', 'artist_name', 'release_date', 'track_id']],
+                    left_on=['track_id'],
+                    right_on=['spotify_track_id'],
                     how='left')
-        df = df.rename(columns={'track_id': 'track_key'})
+        df = df.rename(columns={'track_id_y': 'track_key'})
 
         # merge z wymiarem Artist
-        df = df.merge(self.dim_artist[['artist_id', 'artist_name']], on='artist_name', how='left')
+        df = df.merge(self.dim_artist[['artist_id', 'artist_spotify_id']], 
+                      left_on=['artist_id'],
+                        right_on=['artist_spotify_id'],
+                        how='left')
         df = df.rename(columns={'artist_id': 'artist_key'})
 
 
 
         # łączenie z wymiarem Date
+        df['chart_date'] = pd.to_datetime(df['date'], errors='coerce')
         df['date'] = pd.to_datetime(df['date'])
         self.dim_date['date'] = pd.to_datetime(self.dim_date['date'])
         df = df.merge(self.dim_date[['date_id', 'date']], on='date', how='left')
@@ -227,6 +268,18 @@ class FactChart:
 
         df['source_type'] = df['source_type'].fillna('Unknown')
         df['chart_type'] = df['chart_type'].fillna('Unknown')
+        print("Kolumny po merge z dim_track:", df.columns.tolist())
+
+
+
+        df['release_date'] = pd.to_datetime(df['release_date_y'])
+
+
+        df['days_since_release'] = (df['chart_date'] - df['release_date']).dt.days
+        df['weeks_since_release'] = df['days_since_release'] // 7
+        df['months_since_release'] = (df['chart_date'].dt.year - df['release_date'].dt.year) * 12 + (df['chart_date'].dt.month - df['release_date'].dt.month)
+
+
         
         df = df.reset_index(drop=True)
         df['chart_id'] = df.index + 1
@@ -239,4 +292,4 @@ class FactChart:
 
 
         return df[['chart_id', 'track_key', 'artist_key', 'date_key', 'region_key', 'source_type', 'chart_type', 'rank',
-                   'weeks_on_chart', 'peak_position', 'position_change']]
+                   'weeks_on_chart', 'peak_position', 'position_change','chart_date', 'release_date', 'days_since_release', 'weeks_since_release', 'months_since_release']].drop_duplicates()

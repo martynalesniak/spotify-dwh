@@ -22,9 +22,7 @@ CREATE TABLE dim_Track (
     duration FLOAT,
     explicit BOOLEAN,
     spotify_track_id VARCHAR(22),
-    release_date DATE,
-    date_key BIGINT,
-    FOREIGN KEY (date_key) REFERENCES dim_Date(date_id)
+    release_date DATE
 );
 
 
@@ -44,6 +42,9 @@ CREATE TABLE dim_Region (
     region_population INT,
     region_language VARCHAR(50),
     region_continent VARCHAR(50),
+    is_current BOOLEAN DEFAULT TRUE,
+    valid_from DATE,
+    valid_to DATE
 );
 
 CREATE TABLE Fact_charts (
