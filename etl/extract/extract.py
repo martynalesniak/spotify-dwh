@@ -261,8 +261,11 @@ class EnrichedCSVExtractor(CSVExtractor):
         artist_metadata = {}
 
         for idx, artist in enumerate(unique_artists):
+            cached_artist_id = self.cache.get_artist_id(artist)
+
             if self.cache.get_artist_id(artist):
                 print(f"Skipping MusicBrainz enrichment for cached artist: {artist}")
+                df.loc[df['artist_name'] == artist, 'artist_id'] = cached_artist_id
                 continue
             
             metadata = self.musicbrainz_api.get_artist_metadata(artist)
