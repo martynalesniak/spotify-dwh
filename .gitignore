@@ -3,3 +3,4 @@ venv
 data/
 .cache
 __pycache__
+logs/

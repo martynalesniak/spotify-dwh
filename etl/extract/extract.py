@@ -7,11 +7,41 @@ import json
 import musicbrainzngs
 import time
 from datetime import datetime
+import unicodedata
+import re
 
-# env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
-env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
+env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
+#env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
 load_dotenv(dotenv_path=env_path)
 
+class Cache:
+    def __init__(self, cache_path="../cache/id_cache.json"):
+        self.cache_path = cache_path
+        if os.path.exists(cache_path):
+            with open(cache_path, "r") as f:
+                self.data = json.load(f)
+        else:
+            self.data = {"track_ids": {}, "artist_ids": {}}
+
+    def get_track_id(self, track_name, artist_name):
+        key = f"{track_name.strip().lower()}|{artist_name.strip().lower()}"
+        return self.data["track_ids"].get(key)
+
+    def set_track_id(self, track_name, artist_name, track_id):
+        key = f"{track_name.strip().lower()}|{artist_name.strip().lower()}"
+        self.data["track_ids"][key] = track_id
+
+    def get_artist_id(self, artist_name):
+        key = artist_name.strip().lower()
+        return self.data["artist_ids"].get(key)
+
+    def set_artist_id(self, artist_name, artist_id):
+        key = artist_name.strip().lower()
+        self.data["artist_ids"][key] = artist_id
+
+    def save(self):
+        with open(self.cache_path, "w") as f:
+            json.dump(self.data, f, indent=2)
 class SpotifyExtractor:
     def __init__(self, client_id=None, client_secret=None):
         self.client_id = client_id or os.getenv('SPOTIFY_API_KEY')
@@ -32,7 +62,7 @@ class SpotifyExtractor:
         results = self.sp.search(q=query, type='track', limit=1)
 
         if not results['tracks']['items']:
-            print("No tracks found.")
+            print(f"No tracks found for {track_name} - {artist_name}")
             return None
 
         track_id = results['tracks']['items'][0]['id']
@@ -54,16 +84,9 @@ class SpotifyExtractor:
             artist_name = artist['name']
 
 
-            featuring_artists_raw = artists[1:]
-            featuring_artists = [
-                {
-                    'artist_id': fa['id'],
-                    'artist_name': fa['name']
-                }
-                for fa in featuring_artists_raw
-            ]
+            album_info = track_info.get('album', {})
+            release_date = album_info.get('release_date', None)
 
-            # dane o artyście (gatunki)
             artist_info = self.sp.artist(artist_id)
             genres = artist_info.get('genres', [])
 
@@ -75,8 +98,8 @@ class SpotifyExtractor:
                 'artist_id': artist_id,
                 'artist_name': artist_name,
                 'genres': json.dumps(genres),  # ← teraz jako JSON
-                'featuring_artists': json.dumps(featuring_artists),
-                'artist_count': artist_count
+                'artist_count': artist_count,
+                'release_date': release_date
             }
 
         except Exception as e:
@@ -84,25 +107,31 @@ class SpotifyExtractor:
             return None
         
 class MusicBrainzExtractor:
-    def __init__(self, delay=1.05):
+    def __init__(self, delay=0.1):
         self.delay = delay
         musicbrainzngs.set_useragent("MyCoolApp", "0.1", "mojemail@example.com")
 
+    def clean_artist_name(self, name):
+        name = name.replace('“', '"').replace('”', '"')
+        name = re.sub(r'[‐‑‒–—―]', '-', name)
+        name = unicodedata.normalize('NFKD', name)
+        return name.strip().lower()
     def get_artist_metadata(self, artist_name):
-        """
-        Search for artist by name and returns his country.
-        """
         try:
+            clean_name = self.clean_artist_name(artist_name)
             result = musicbrainzngs.search_artists(artist=artist_name, limit=15)
             artists = result.get('artist-list', [])
             if not artists:
                 print("Artists not found.")
                 return None
             
-            matching_artist = next((a for a in artists if a.get('name', '').lower() == artist_name.lower()), None)
+            # Użyj clean_name do porównania
+            matching_artist = next(
+                (a for a in artists if self.clean_artist_name(a.get('name', '')) == clean_name), None
+            )
 
             if not matching_artist:
-                print("Artist not found.")
+                print(f"Artist not found for {artist_name}")
                 return None
             
             mbid = matching_artist['id']
@@ -117,7 +146,9 @@ class MusicBrainzExtractor:
             }
 
         except Exception as e:
+            print(f"Błąd MusicBrainz dla {artist_name}: {e}")
             return None
+        
 class CSVExtractor:
     COL_MAPPINGS = {
         "title":"track_name",
@@ -174,12 +205,14 @@ class EnrichedCSVExtractor(CSVExtractor):
         super().__init__(source)
         self.spotify_api = SpotifyExtractor()
         self.musicbrainz_api = MusicBrainzExtractor()
+        self.cache = Cache()
 
     def enrich_with_spotify_data(self, df):
         """Enrich DataFrame with Spotify metadata"""
 
         enriched_data = []
         
+
         for idx, row in df.iterrows():
             track_name = row.get('track_name')
             artist_name = row.get('artist_name')
@@ -187,20 +220,34 @@ class EnrichedCSVExtractor(CSVExtractor):
             if pd.isna(track_name) or pd.isna(artist_name):
                 continue
             
+            cached_track_id = self.cache.get_track_id(track_name, artist_name)
             # Get Spotify data
-            track_id = self.spotify_api.get_track_id(track_name, artist_name)
-            if track_id:
-                spotify_metadata = self.spotify_api.get_track_metadata(track_id)
-                if spotify_metadata:
-                    # Merge original data with Spotify data
-                    enriched_row = {**row.to_dict(), **spotify_metadata}
-                    enriched_data.append(enriched_row)
+            if cached_track_id:
+
+                # Mamy track_id w cache, więc pomijamy API i dodajemy minimalne dane
+                enriched_row = row.to_dict()
+                enriched_row['track_id'] = cached_track_id
+                # Ewentualnie możesz tu wstawić None dla pozostałych metadanych,
+                # albo jeśli masz cache z metadanymi - pobierz je stąd
+                enriched_data.append(enriched_row)
+            else:
+                track_id = self.spotify_api.get_track_id(track_name, artist_name)
+                if track_id:
+                    spotify_metadata = self.spotify_api.get_track_metadata(track_id)
+                    if spotify_metadata:
+                        # Cacheujemy track_id i artist_id
+                        self.cache.set_track_id(track_name, artist_name, track_id)
+                        #self.cache.set_artist_id(spotify_metadata['artist_name'], spotify_metadata['artist_id'])
+                        
+                        enriched_row = {**row.to_dict(), **spotify_metadata}
+                        enriched_data.append(enriched_row)
             
-            # Rate limiting
             time.sleep(0.1)
             
             if idx % 10 == 0:
                 print(f"Processed {idx}/{len(df)} tracks for Spotify enrichment")
+                self.cache.save()
+        self.cache.save()
         
         if enriched_data:
             return pd.DataFrame(enriched_data)
@@ -212,19 +259,34 @@ class EnrichedCSVExtractor(CSVExtractor):
 
         unique_artists = df['artist_name'].dropna().unique()
         artist_metadata = {}
-        
-        for artist in unique_artists:
+
+        for idx, artist in enumerate(unique_artists):
+            if self.cache.get_artist_id(artist):
+                print(f"Skipping MusicBrainz enrichment for cached artist: {artist}")
+                continue
+            
             metadata = self.musicbrainz_api.get_artist_metadata(artist)
             if metadata:
                 artist_metadata[artist] = metadata
-
+            
+            artist_row = df[df['artist_name'] == artist].iloc[0]
+            if 'artist_id' in artist_row:
+                self.cache.set_artist_id(artist, artist_row['artist_id'])
+            
+            if idx % 10 == 0:
+                print(f"Processed {idx}/{len(unique_artists)} artists for MusicBrainz enrichment")
+                self.cache.save()
+        
+        self.cache.save()
+        
         for artist, metadata in artist_metadata.items():
             mask = df['artist_name'] == artist
             for key, value in metadata.items():
-                if key != 'artist_name':  # Don't overwrite existing artist_name
+                if key != 'artist_name':
                     df.loc[mask, f'mb_{key}'] = value
-        
+
         return df
+    
     def extract_data(self, file_path, limit=30, enrich=True):
         """Extract data with optional API enrichment"""
 
