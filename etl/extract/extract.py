@@ -10,8 +10,8 @@ from datetime import datetime
 import unicodedata
 import re
 
-env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
-#env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
+# env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
+env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
 load_dotenv(dotenv_path=env_path)
 
 class Cache:
@@ -91,7 +91,7 @@ class SpotifyExtractor:
             genres = artist_info.get('genres', [])
 
             return {
-                'track_id': track_id,
+                'spotify_track_id': track_id,
                 'track_name': track_name,
                 'duration': duration,
                 'explicit': explicit,

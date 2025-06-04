@@ -15,14 +15,16 @@ CREATE TABLE dim_Date (
 
 
 CREATE TABLE dim_Track (
-    track_key BIGINT PRIMARY KEY,
+    track_id BIGINT PRIMARY KEY,
     track_name VARCHAR(255),
     artist_name VARCHAR(100),
-    featuring_artists JSONB,
     artist_count TINYINT,
     duration FLOAT,
     explicit BOOLEAN,
-    spotify_track_id VARCHAR(22)
+    spotify_track_id VARCHAR(22),
+    release_date DATE,
+    date_key BIGINT,
+    FOREIGN KEY (date_key) REFERENCES dim_Date(date_id)
 );
 
 
