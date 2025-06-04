@@ -8,6 +8,40 @@ from date_features import *
 from region import get_country_code, continent_mapping, country_to_language
 
 
+class ChartPreprocessor:
+    def __init__(self, region="Global", chart_type="Billboard"):
+        self.region = region
+        self.chart_type = chart_type
+       
+
+    def transform(self, df):
+        df = df.copy()
+
+        # Dodaj 'region' jeśli nie istnieje
+        if 'region' not in df.columns:
+            df['region'] = self.region
+
+        # Dodaj 'chart_type' jeśli nie istnieje
+        if 'chart_type' not in df.columns:
+            df['chart_type'] = self.chart_type
+
+        # Zamień 'Last Week' na 'previous_rank'
+        if 'Last Week' in df.columns:
+            df['previous_rank'] = df['Last Week']
+            df.drop(columns=['Last Week'], inplace=True)
+
+        # Usuń 'Image URL' jeśli istnieje
+        if 'Image URL' in df.columns:
+            df.drop(columns=['Image URL'], inplace=True)
+
+        if 'spotify_track_id' not in df.columns:
+            df['spotify_track_id'] = df['track_id']
+        
+        if 'release_date' not in df.columns:
+            df['release_date'] = pd.NaT
+
+        return df
+
 
 
 def safe_literal_eval(val):
