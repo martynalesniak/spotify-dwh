@@ -123,7 +123,7 @@ class CSVExtractor:
         "title":"track_name",
         "artist":"artist_name",
         "chart": "chart_type",
-        # "trend": "position_change",
+        "trend": "position_change",
         "Date":"date",
         "Song":"track_name",
         "Artist":"artist_name",
