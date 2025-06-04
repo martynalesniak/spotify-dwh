@@ -96,7 +96,7 @@ class SpotifyExtractor:
             genres = artist_info.get('genres', [])
 
             return {
-                'spotify_track_id': track_id,
+                'track_id': track_id,
                 'track_name': track_name,
                 'duration': duration,
                 'explicit': explicit,
@@ -168,6 +168,7 @@ class CSVExtractor:
         "Weeks in Charts": "weeks_on_chart"
 
     }
+    
     def __init__(self, source):
         self.source = source
 
@@ -234,6 +235,7 @@ class EnrichedCSVExtractor(CSVExtractor):
                 enriched_data.append(enriched_row)
             else:
                 track_id = self.spotify_api.get_track_id(track_name, artist_name)
+
                 if track_id:
                     spotify_metadata = self.spotify_api.get_track_metadata(track_id)
                     if spotify_metadata:
@@ -273,6 +275,7 @@ class EnrichedCSVExtractor(CSVExtractor):
             metadata = self.musicbrainz_api.get_artist_metadata(artist_name)
             if metadata:
                 artist_metadata[artist_id] = metadata
+
             
             self.cache.set_artist_status(artist_id, True)
             

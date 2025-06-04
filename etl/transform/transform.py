@@ -39,8 +39,10 @@ class ChartPreprocessor:
 
         df['weeks_on_chart'] = df['weeks_on_chart'].replace('-', 0)
 
+    
 
-        
+
+
     
 
         return df
@@ -144,6 +146,8 @@ class ArtistDimension:
         # Sprawdzenie, czy wszystkie potrzebne kolumny istnieją
         if 'genres' not in df.columns:
             return pd.DataFrame()
+        
+        df = df[df['genres'].notna()]
 
 
 
@@ -179,6 +183,8 @@ class TrackDimension:
         # czy mamy kolmne release_date?
         if 'release_date' not in df.columns:
             return pd.DataFrame()
+        
+        df = df[df['release_date'].notna()]
 
 
         # Normalizacja i konwersje
@@ -224,14 +230,17 @@ class FactChart:
         df = self.df.copy()
 
        # merge z wymiarem Track
-        df = df.merge(self.dim_track[['track_id', 'track_name', 'artist_name', 'release_date']],
-                    left_on=['track_name', 'artist_name'],
-                    right_on=['track_name', 'artist_name'],
+        df = df.merge(self.dim_track[['spotify_track_id', 'track_name', 'artist_name', 'release_date', 'track_id']],
+                    left_on=['track_id'],
+                    right_on=['spotify_track_id'],
                     how='left')
-        df = df.rename(columns={'track_id': 'track_key'})
+        df = df.rename(columns={'track_id_y': 'track_key'})
 
         # merge z wymiarem Artist
-        df = df.merge(self.dim_artist[['artist_id', 'artist_name']], on='artist_name', how='left')
+        df = df.merge(self.dim_artist[['artist_id', 'artist_spotify_id']], 
+                      left_on=['artist_id'],
+                        right_on=['artist_spotify_id'],
+                        how='left')
         df = df.rename(columns={'artist_id': 'artist_key'})
 
 

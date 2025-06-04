@@ -1,0 +1,51 @@
+track_name,rank,date,artist_name,region,chart_type,position_change,weeks_on_chart,peak_position,previous_rank,source_type,spotify_track_id,duration,explicit,artist_id,genres,artist_count,release_date,track_id,country,type
+#BrooklynBloodPop!,7,2021-05-17,SyKo,Argentina,viral50,SAME_POSITION,9,5,,charts_viral50,5tDbyeaCvxjNCBcupQucGo,145.612,True,08ZqXO40nMrhBoGma4kls2,"[""hyperpop""]",1.0,2020-07-27,,Seattle,Person
+#BrooklynBloodPop!,5,2021-05-24,SyKo,Argentina,viral50,MOVE_UP,9,5,7.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#BrooklynBloodPop!,11,2021-05-31,SyKo,Argentina,viral50,MOVE_DOWN,9,5,5.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#BrooklynBloodPop!,13,2021-06-07,SyKo,Argentina,viral50,MOVE_DOWN,9,5,11.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#BrooklynBloodPop!,16,2021-06-14,SyKo,Argentina,viral50,MOVE_DOWN,9,5,13.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#BrooklynBloodPop!,18,2021-06-21,SyKo,Argentina,viral50,MOVE_DOWN,9,5,16.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#BrooklynBloodPop!,39,2021-06-28,SyKo,Argentina,viral50,MOVE_DOWN,9,5,18.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#BrooklynBloodPop!,36,2021-07-05,SyKo,Argentina,viral50,MOVE_DOWN,9,5,39.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#BrooklynBloodPop!,46,2021-07-12,SyKo,Argentina,viral50,MOVE_DOWN,9,5,36.0,charts_viral50,,,,08ZqXO40nMrhBoGma4kls2,,,,5tDbyeaCvxjNCBcupQucGo,Seattle,Person
+#Natural,22,2018-01-08,"Paty Cantú, Juhn",Argentina,viral50,SAME_POSITION,3,12,,charts_viral50,,,,7K9rdoOJSiKXoVXPlSkGKT,,,,3y7XIu4NloDcCSekDbCvf6,,
+#Natural,12,2018-01-15,"Paty Cantú, Juhn",Argentina,viral50,SAME_POSITION,3,12,22.0,charts_viral50,,,,7K9rdoOJSiKXoVXPlSkGKT,,,,3y7XIu4NloDcCSekDbCvf6,,
+#Natural,27,2018-01-22,"Paty Cantú, Juhn",Argentina,viral50,MOVE_DOWN,3,12,12.0,charts_viral50,,,,7K9rdoOJSiKXoVXPlSkGKT,,,,3y7XIu4NloDcCSekDbCvf6,,
+#WIPEITDOWN (TikTok Classics Version),43,2020-06-08,BMW Kenny,Argentina,viral50,NEW_ENTRY,1,43,,charts_viral50,5qOE3kEU14vcc6OUDkgKkv,135.317,False,5iB9AOsC0IyhPYES06AYo0,[],2.0,2022-08-12,,,Person
+#Ysya2020 Vol. 1 - Una de Dos,32,2020-07-13,"YSY A, CLUB HATS",Argentina,viral50,NEW_ENTRY,1,32,,charts_viral50,,,,2qWK8K2Jfh67UqtwY8tCW6,,,,7nFta4LZyL0MTDDqbjiQW2,,
+#Ysya2020 Vol. 4 - Pasa Que Yo,28,2020-11-02,"YSY A, Yesan 雪山",Argentina,viral50,NEW_ENTRY,1,28,,charts_viral50,,,,2qWK8K2Jfh67UqtwY8tCW6,,,,7qf15ZBTnAyOZX5UIWrsKj,,
+#Ysya2020 Vol. 5 - Silbando,43,2020-11-16,"YSY A, CLUB HATS",Argentina,viral50,NEW_ENTRY,1,43,,charts_viral50,,,,2qWK8K2Jfh67UqtwY8tCW6,,,,6TI490muJ6RgFsYJc626BZ,,
+#Ysya2020 Vol. 6 - Un Flow de Infarto,22,2020-11-16,"YSY A, Bizarrap",Argentina,viral50,NEW_ENTRY,1,22,,charts_viral50,,,,2qWK8K2Jfh67UqtwY8tCW6,,,,2byu6eeLWaBq88ZtusqU4V,,
+Good Thing,42,2018-05-07,i-dle,Argentina,viral50,NEW_ENTRY,1,42,,charts_viral50,6d8DgvFxp6lbdfOw9BVkLS,154.386,False,2AfmfGFbe0A0WsTYm0SDTx,"[""k-pop""]",1.0,2025-05-19,,South Korea,Group
+(It Happens) Sometimes,25,2018-09-24,Jack Back,Argentina,viral50,NEW_ENTRY,1,25,,charts_viral50,4psxV3oAIDBXKL2oS9KcFq,202.276,False,4bXUaTjc7TQTvLqqCAlfYt,"[""tech house""]",1.0,2018-08-31,,United States,Person
+(You Make Me Feel Like) A Natural Woman,31,2018-08-20,Aretha Franklin,Argentina,viral50,MOVE_UP,1,31,,charts_viral50,5K09WxKdlkroDyEVyOSySy,165.333,False,7nwUJBm0HE4ZxD3f5cy5ok,"[""soul"", ""motown"", ""classic soul"", ""jazz blues""]",1.0,1968-01-22,,United States,Person
+(no me despegues tu boca),49,2020-04-27,Covi Quintana,Argentina,viral50,NEW_ENTRY,1,49,,charts_viral50,2j0KnNhlO9lY1EWPOkblK3,220.84,False,2sSqkk6j5gRa7MzeQqMfIN,[],1.0,2021-05-21,,,Person
++,25,2020-01-13,"Aitana, Cali Y El Dandee",Argentina,viral50,NEW_ENTRY,7,25,,charts_viral50,,,,7eLcDZDYHXZCebtQmVFL25,,,,1MXzojJav1N4cREWTFm1iZ,,
++,25,2020-01-20,"Aitana, Cali Y El Dandee",Argentina,viral50,MOVE_UP,7,25,25.0,charts_viral50,,,,7eLcDZDYHXZCebtQmVFL25,,,,1MXzojJav1N4cREWTFm1iZ,,
++,44,2020-01-27,"Aitana, Cali Y El Dandee",Argentina,viral50,MOVE_DOWN,7,25,25.0,charts_viral50,,,,7eLcDZDYHXZCebtQmVFL25,,,,1MXzojJav1N4cREWTFm1iZ,,
++,46,2020-02-17,"Aitana, Cali Y El Dandee",Argentina,viral50,NEW_ENTRY,7,25,44.0,charts_viral50,,,,7eLcDZDYHXZCebtQmVFL25,,,,1MXzojJav1N4cREWTFm1iZ,,
++,42,2020-02-24,"Aitana, Cali Y El Dandee",Argentina,viral50,MOVE_DOWN,7,25,46.0,charts_viral50,,,,7eLcDZDYHXZCebtQmVFL25,,,,1MXzojJav1N4cREWTFm1iZ,,
++,50,2020-03-02,"Aitana, Cali Y El Dandee",Argentina,viral50,MOVE_DOWN,7,25,42.0,charts_viral50,,,,7eLcDZDYHXZCebtQmVFL25,,,,1MXzojJav1N4cREWTFm1iZ,,
++,49,2020-03-09,"Aitana, Cali Y El Dandee",Argentina,viral50,SAME_POSITION,7,25,50.0,charts_viral50,,,,7eLcDZDYHXZCebtQmVFL25,,,,1MXzojJav1N4cREWTFm1iZ,,
+...Ready For It?,1,2017-09-04,Taylor Swift,Argentina,viral50,NEW_ENTRY,2,1,,charts_viral50,2yLa0QULdQr0qAIvVwN6B5,208.186,False,06HL4z0CvFAxyc27GXpf02,[],1.0,2017-11-10,,United States,Person
+...Ready For It?,10,2017-09-11,Taylor Swift,Argentina,viral50,MOVE_DOWN,2,1,1.0,charts_viral50,,,,06HL4z0CvFAxyc27GXpf02,,,,2yLa0QULdQr0qAIvVwN6B5,United States,Person
+"0 Sentimientos (Remix) [feat. Baby Rasta, Darkiel, Messiah & Lyan]",7,2017-01-02,Boy Wonder CF,Argentina,viral50,MOVE_UP,1,7,,charts_viral50,3gYco8uoFBmpxqYlz3Zhs7,335.736,False,01nUdqwuIHCHLZNP2TvYVF,"[""reggaeton"", ""trap latino""]",8.0,2023-11-21,,,
+0303456 - 1999 vrs,36,2021-07-12,Raffaella Carrà,Argentina,viral50,MOVE_DOWN,1,36,,charts_viral50,1TtHlaxGzDhyF2GyX8dqWV,199.92,False,6EVyI0S0b1Ld2nm37m5x85,[],1.0,1999-10-29,,Italy,Person
+06:00AM CHILDREN OF THE SUN,49,2018-07-09,SACRE,Argentina,viral50,NEW_ENTRY,1,49,,charts_viral50,5BLWG0gtrci22tCyPu2bsP,225.693,False,68nJ4J8L6X6HZNTuZ9e7yT,"[""nu disco""]",1.0,2020-07-10,,,Person
+0X1=LOVESONG (I Know I Love You) feat. Seori,27,2021-06-28,TOMORROW X TOGETHER,Argentina,viral50,SAME_POSITION,1,27,,charts_viral50,1Z8TPHiKeCUyClxV6WTTIf,202.203,False,0ghlgldX5Dd6720Q3qFyQB,"[""k-pop""]",2.0,2021-05-31,,South Korea,Group
+0X1=LOVESONG (I Know I Love You) feat. Seori,26,2021-06-21,TOMORROW X TOGETHER,Argentina,viral50,NEW_ENTRY,1,26,,charts_viral50,1Z8TPHiKeCUyClxV6WTTIf,202.203,False,0ghlgldX5Dd6720Q3qFyQB,"[""k-pop""]",2.0,2021-05-31,,South Korea,Group
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",3,2018-02-19,Sofía Reyes,Argentina,viral50,NEW_ENTRY,11,1,,charts_viral50,4QtiVmuA88tPQiCOHZuQ5b,201.526,False,0haZhu4fFKt0Ag94kZDiz2,"[""latin pop""]",3.0,2018-02-16,,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",1,2018-02-26,Sofía Reyes,Argentina,viral50,SAME_POSITION,11,1,3.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",9,2018-03-05,Sofía Reyes,Argentina,viral50,MOVE_DOWN,11,1,1.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",15,2018-03-12,Sofía Reyes,Argentina,viral50,MOVE_UP,11,1,9.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",16,2018-03-19,Sofía Reyes,Argentina,viral50,MOVE_DOWN,11,1,15.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",16,2018-03-26,Sofía Reyes,Argentina,viral50,MOVE_DOWN,11,1,16.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",10,2018-04-02,Sofía Reyes,Argentina,viral50,SAME_POSITION,11,1,16.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",17,2018-04-09,Sofía Reyes,Argentina,viral50,MOVE_DOWN,11,1,10.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",21,2018-04-16,Sofía Reyes,Argentina,viral50,MOVE_DOWN,11,1,17.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",34,2018-04-23,Sofía Reyes,Argentina,viral50,MOVE_DOWN,11,1,21.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3 (feat. Jason Derulo & De La Ghetto)",33,2018-04-30,Sofía Reyes,Argentina,viral50,MOVE_DOWN,11,1,34.0,charts_viral50,,,,0haZhu4fFKt0Ag94kZDiz2,,,,4QtiVmuA88tPQiCOHZuQ5b,Mexico,Person
+"1, 2, 3!",42,2018-07-23,SEUNGRI,Argentina,viral50,NEW_ENTRY,3,10,,charts_viral50,3EyJd7XKw4lrIZXQboMDbv,205.304,False,20j1uz7iDOtIvIzCr5S8nx,"[""k-pop""]",1.0,2018-07-20,,,
+"1, 2, 3!",10,2018-07-30,SEUNGRI,Argentina,viral50,NEW_ENTRY,3,10,42.0,charts_viral50,,,,20j1uz7iDOtIvIzCr5S8nx,,,,3EyJd7XKw4lrIZXQboMDbv,,
+"1, 2, 3!",27,2018-08-06,SEUNGRI,Argentina,viral50,MOVE_DOWN,3,10,10.0,charts_viral50,,,,20j1uz7iDOtIvIzCr5S8nx,,,,3EyJd7XKw4lrIZXQboMDbv,,
+1-800-273-8255,20,2017-05-08,Logic,Argentina,viral50,MOVE_DOWN,3,17,,charts_viral50,5tz69p7tJuGPeMGwNTxYuV,250.173,True,4xRYI6VqpkE3UwrDrAZL8L,[],3.0,2017-05-05,,United States,Person
