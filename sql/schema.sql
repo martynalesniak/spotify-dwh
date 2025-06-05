@@ -23,8 +23,8 @@ CREATE TABLE dim_Track (
     explicit BOOLEAN,
     spotify_track_id VARCHAR(22),
     release_date DATE
-    date_key BIGINT,
-    FOREIGN KEY (date_key) REFERENCES dim_Date(date_id)
+    -- date_key BIGINT,
+    -- FOREIGN KEY (date_key) REFERENCES dim_Date(date_id)
 );
 
 

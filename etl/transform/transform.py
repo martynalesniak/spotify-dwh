@@ -41,10 +41,6 @@ class ChartPreprocessor:
 
     
 
-
-
-    
-
         return df
 
 
@@ -64,8 +60,12 @@ class DateDimension:
 
     def transform(self):
         df = self.df.copy()
-        df[self.date_column] = pd.to_datetime(df[self.date_column], errors='coerce')
-        df = df[df[self.date_column].notna()]
+
+        # Jeśli date to tylko rok (np. '2025'), dodaj '-01-01'
+        df['date'] = df['date'].apply(lambda x: x + '-01-01' if len(x) == 4 else x)
+
+        # Konwertuj do daty
+        df['date'] = pd.to_datetime(df['date'])
 
         country_holidays = holidays.country_holidays('US')
 
@@ -80,7 +80,7 @@ class DateDimension:
         df['season'] = df[self.date_column].dt.month.map(self.get_season)
         df['is_holiday'] = df[self.date_column].apply(lambda x: x in country_holidays)
         df['holiday_name'] = df[self.date_column].apply(lambda x: country_holidays.get(x, None))
-        df['date_id'] = pd.factorize(df['date'])[0] + 1
+        df['date_id'] = df['date'].dt.strftime('%Y%m%d').astype(int)
 
 
         return df[['date_id', 'year', 'month', 'day', 'day_of_week', 'quarter', 'season',
@@ -131,8 +131,13 @@ class RegionDimension:
 
         df['region_population'] = df['Population'].astype(int).fillna(0)
 
+        df['is_current'] = True
+        df['valid_from'] = pd.to_datetime('2000-01-01')
+        df['valid_to'] = pd.to_datetime('2099-12-31')
+
         df['region_id'] = pd.factorize(df[self.region_column])[0] + 1
-        return df[['region_id', self.region_column, 'region_code', 'region_population', 
+        return df[['region_id', self.region_column, 'region_code', 'region_population', 'is_current',
+                   'valid_from', 'valid_to',
                    'region_language', 'region_continent']].rename(columns={self.region_column: 'region_name'}).drop_duplicates()
 
 
@@ -184,6 +189,11 @@ class TrackDimension:
         if 'release_date' not in df.columns:
             return pd.DataFrame()
         
+        df['release_date'] = df['release_date'].apply(lambda x: x + '-01-01' if len(x) == 4 else x)
+
+        # Konwertuj do daty
+        df['release_date'] = pd.to_datetime(df['release_date'])
+
         df = df[df['release_date'].notna()]
 
 
