@@ -99,7 +99,7 @@ class SpotifyExtractor:
             genres = artist_info.get('genres', [])
 
             return {
-                'spotify_track_id': track_id,
+                'track_id': track_id,
                 'track_name': track_name,
                 'duration': duration,
                 'explicit': explicit,
