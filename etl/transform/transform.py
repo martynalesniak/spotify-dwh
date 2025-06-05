@@ -9,11 +9,10 @@ from region import get_country_code, continent_mapping, country_to_language
 
 
 class ChartPreprocessor:
-    def __init__(self, region="Global", chart_type="Billboard"):
+    def __init__(self, region="Global"):
         self.region = region
-        self.chart_type = chart_type
-       
-
+   
+    
     def transform(self, df):
         df = df.copy()
 
@@ -23,7 +22,13 @@ class ChartPreprocessor:
 
         # Dodaj 'chart_type' jeśli nie istnieje
         if 'chart_type' not in df.columns:
-            df['chart_type'] = self.chart_type
+            if df['source_type'] == 'billboard200':
+                df['chart_type'] = 'top200'
+            elif df['source_type'] == 'hot100':
+                df['chart_type'] = 'top100'
+            else:
+                df['chart_type'] = 'other'
+           
 
         # Zamień 'Last Week' na 'previous_rank'
         if 'Last Week' in df.columns:
