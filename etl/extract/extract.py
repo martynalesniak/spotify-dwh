@@ -10,7 +10,7 @@ from datetime import datetime
 import unicodedata
 import re
 import traceback
-from etl.utils.offset_variable import get_offset, update_offset
+from utils.offset_variable import get_file_offset, update_file_offset
 # env_path = r"C:\Users\marty\OneDrive\Pulpit\studia\sem6\hurtownie\spotify-dwh\.env"
 #env_path = r'C:\Users\ulasz\OneDrive\Pulpit\studia\sem6\hurtownie danych\spotify-dwh\.env'
 #load_dotenv(dotenv_path=env_path)
@@ -18,7 +18,7 @@ from etl.utils.offset_variable import get_offset, update_offset
 load_dotenv()
 
 class Cache:
-    def __init__(self, cache_path="/app/cache/id_cache.json"):
+    def __init__(self, cache_path="/opt/airflow/data/cache/id_cache.json"):
         self.cache_path = cache_path
         os.makedirs(os.path.dirname(cache_path), exist_ok=True)
         if os.path.exists(cache_path):
@@ -195,14 +195,14 @@ class CSVExtractor:
     def extract_data(self, file_path, offset=0, limit=100):
         try:
             source_type = os.path.basename(file_path).split('.')[0]
-            current_offset = offset if offset > 0 else get_offset(source_type)
+            current_offset = offset if offset > 0 else get_file_offset(source_type)
             
             print(f"Reading {limit} rows from offset {current_offset} in {file_path}")
             df = pd.read_csv(file_path, skiprows=range(1, current_offset + 1), nrows=limit)
             df = self.standardize_columns(df)
             df['source_type'] = source_type
 
-            update_offset(source_type, current_offset + len(df))
+            update_file_offset(source_type, current_offset + len(df))
             return df
             
         except Exception as e:

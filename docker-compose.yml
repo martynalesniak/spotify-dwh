@@ -2,7 +2,7 @@ version: "3.8"
 
 x-airflow-common:
   &airflow-common
-  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.10.5}
+  build: .
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
@@ -11,15 +11,16 @@ x-airflow-common:
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+    PYTHONPATH: /opt/airflow/etl 
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
     - airflow_data:/opt/airflow/data
     - ${AIRFLOW_PROJ_DIR:-.}/sources:/opt/airflow/sources
-
+    - ${AIRFLOW_PROJ_DIR:-.}/etl:/opt/airflow/etl
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     redis:
@@ -105,7 +106,9 @@ services:
       - -c
       - |
         mkdir -p /sources/logs /sources/dags /sources/plugins
+        mkdir -p /opt/airflow/data/cache
         chown -R "${AIRFLOW_UID}:0" /sources/{logs,dags,plugins}
+        chown -R "${AIRFLOW_UID}:0" /opt/airflow/data
         exec /entrypoint airflow version
     environment:
       <<: *airflow-common-env
@@ -144,7 +147,7 @@ services:
       - ./cache:/app/cache
       - ./sources:/app/sources
       - airflow_data:/app/data
-      - - ./.env:/app/.env
+      - ./.env:/app/.env
     command: tail -f /dev/null
     environment:
       - DB_HOST=${SPOTIFY_DB_HOST}
@@ -163,3 +166,4 @@ services:
 volumes:
   postgres-db-volume:
   spotify-db-volume:
+  airflow_data:

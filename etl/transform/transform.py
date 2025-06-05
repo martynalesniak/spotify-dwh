@@ -4,8 +4,8 @@ import world_bank_data as wb
 import pycountry
 from datetime import datetime
 import ast
-from date_features import *
-from region import get_country_code, continent_mapping, country_to_language
+from .date_features import *
+from .region import get_country_code, continent_mapping, country_to_language
 
 
 class ChartPreprocessor:
