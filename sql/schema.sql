@@ -32,7 +32,7 @@ CREATE TABLE dim_Artist (
     artist_id BIGINT PRIMARY KEY,
     artist_spotify_id VARCHAR(22), 
     artist_name VARCHAR(255),
-    artist_genre JSONB,
+    artist_genre VARCHAR(60),
     artist_country VARCHAR(100),
     artist_type VARCHAR(50)
 );
@@ -61,6 +61,9 @@ CREATE TABLE Fact_charts (
     weeks_on_chart SMALLINT,
     peak_position SMALLINT,
     position_change SMALLINT,
+    days_since_release SMALLINT,
+    weeks_since_release SMALLINT,
+    months_since_release SMALLINT,
     FOREIGN KEY (track_key) REFERENCES dim_Track(track_id),
     FOREIGN KEY (artist_key) REFERENCES dim_Artist(artist_id),
     FOREIGN KEY (date_key) REFERENCES dim_Date(date_id),
