@@ -10,18 +10,28 @@ x-airflow-common:
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth,airflow.api.auth.backend.session'
+    _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME}
+    _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD}
+    SPOTIFY_API_KEY: ${SPOTIFY_API_KEY}
+    SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET}
     PYTHONPATH: /opt/airflow/etl 
+    DB_HOST: ${SPOTIFY_DB_HOST}
+    DB_PORT: ${SPOTIFY_DB_PORT}
+    DB_NAME: ${SPOTIFY_DB_NAME}
+    DB_USER: ${SPOTIFY_DB_USER}
+    DB_PASS: ${SPOTIFY_DB_PASSWORD}
   volumes:
     - ${AIRFLOW_PROJ_DIR:-.}/dags:/opt/airflow/dags
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
-    - airflow_data:/opt/airflow/data
+    - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
     - ${AIRFLOW_PROJ_DIR:-.}/sources:/opt/airflow/sources
     - ${AIRFLOW_PROJ_DIR:-.}/etl:/opt/airflow/etl
-  user: "${AIRFLOW_UID:-50000}:0"
+  user: "0:0"
   depends_on:
     redis:
       condition: service_healthy
@@ -130,7 +140,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - spotify-db-volume:/var/lib/postgresql/data
+      - spotify-db-volume:/var/lib/postgresql/data  
       - ./db_init:/docker-entrypoint-initdb.d
     restart: always
     healthcheck: 
@@ -147,7 +157,6 @@ services:
       - ./cache:/app/cache
       - ./sources:/app/sources
       - airflow_data:/app/data
-      - ./.env:/app/.env
     command: tail -f /dev/null
     environment:
       - DB_HOST=${SPOTIFY_DB_HOST}
